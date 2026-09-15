@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cuñapé Control Pro</title>
+<style>
+:root{--brown:#7a431d;--gold:#e9b35b;--cream:#fff8eb;--dark:#3d2416;--green:#27834b;--red:#b53b32}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--cream);color:var(--dark)}
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,#fff 0 8%,transparent 9%),radial-gradient(circle at 80% 70%,#fff 0 7%,transparent 8%),linear-gradient(135deg,#5b2d14,#d78b35)}
+.card{background:#fffdf8;border-radius:24px;box-shadow:0 18px 50px #3d241655;padding:35px;width:min(420px,92vw);text-align:center}
+.logo{font-size:64px;margin-bottom:4px}.brand{font-size:30px;font-weight:800;color:var(--brown)}.sub{color:#8a6a54;margin-bottom:25px}
+input,select{width:100%;padding:12px 13px;border:1px solid #dbc7b4;border-radius:10px;margin:6px 0 12px;background:white}
+button{border:0;border-radius:10px;padding:11px 16px;background:var(--brown);color:white;font-weight:700;cursor:pointer}
+button.secondary{background:#ead9c7;color:var(--dark)}button.danger{background:var(--red)}
+.app{display:none;min-height:100vh}.sidebar{position:fixed;left:0;top:0;bottom:0;width:245px;background:#4c2917;color:white;padding:22px 15px;overflow:auto}.sidebar h2{margin:0 8px 20px}.nav button{display:block;width:100%;text-align:left;background:transparent;margin:4px 0;padding:12px;color:#fff;border-radius:10px}.nav button:hover,.nav button.active{background:#ffffff18}.main{margin-left:245px;padding:25px;max-width:1450px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.crumb{color:#8b674e}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px}.stat{background:white;border:1px solid #eadaca;border-radius:16px;padding:18px;box-shadow:0 4px 15px #5b2d1410}.stat b{display:block;font-size:25px;margin-top:7px}.panel{background:white;border:1px solid #eadaca;border-radius:16px;padding:20px;margin-top:18px}.panel h3{margin-top:0}.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #e4d4c5;padding:10px;text-align:left}th{background:#f4e4d1}.right{text-align:right}.positive{color:var(--green);font-weight:800}.negative{color:var(--red);font-weight:800}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.note{font-size:13px;color:#806957}.hidden{display:none}
+.cunape-bg{position:fixed;right:18px;bottom:10px;opacity:.09;font-size:130px;pointer-events:none}
+@media(max-width:800px){.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0}.nav{display:grid;grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div id="login" class="login">
+  <div class="card">
+    <div class="logo">🧀🥯</div><div class="brand">CUÑAPÉ CONTROL PRO</div>
+    <div class="sub">Sistema de producción, ventas y rentabilidad</div>
+    <input id="user" placeholder="Usuario" autocomplete="username">
+    <input id="pass" type="password" placeholder="Contraseña" autocomplete="current-password">
+    <button style="width:100%" onclick="login()">INGRESAR</button>
+    <p class="note">Acceso inicial: <b>admin</b> / <b>admin123</b></p>
+  </div>
+</div>
+
+<div id="app" class="app">
+<aside class="sidebar">
+  <h2>🥯 Cuñapé</h2>
+  <div class="nav">
+    <button onclick="show('dashboard')" class="active">🏠 Inicio</button>
+    <button onclick="show('inversion')">💰 Capital de inversión</button>
+    <button onclick="show('operacion')">🏦 Capital de operación</button>
+    <button onclick="show('materia')">🧀 Materia prima</button>
+    <button onclick="show('mano')">👩‍🍳 Mano de obra</button>
+    <button onclick="show('otros')">🔥 Otros gastos producción</button>
+    <button onclick="show('fijos')">🏠 Costos fijos / depreciación</button>
+    <button onclick="show('ventas')">🛒 Ventas / ingresos</button>
+    <button onclick="show('egresos')">💸 Egresos</button>
+    <button onclick="show('costos')">📦 Costos de producción</button>
+    <button onclick="show('reportes')">📊 Reportes</button>
+    <button onclick="logout()">🚪 Salir</button>
+  </div>
+</aside>
+<main class="main">
+  <div class="top"><div><h1 id="title">Panel principal</h1><div class="crumb">Control integral del emprendimiento de cuñapé</div></div><div>📅 <span id="today"></span></div></div>
+
+  <section id="dashboard" class="page">
+    <div class="grid">
+      <div class="stat">💵 Ingresos<b id="sIncome">Bs 0.00</b></div>
+      <div class="stat">💸 Egresos<b id="sExpense">Bs 0.00</b></div>
+      <div class="stat">📦 Costo producción<b id="sCost">Bs 0.00</b></div>
+      <div class="stat">📈 Resultado<b id="sProfit">Bs 0.00</b></div>
+      <div class="stat">🥯 Unidades vendidas<b id="sUnits">0</b></div>
+      <div class="stat">💰 Inversión<b id="sInv">Bs 0.00</b></div>
+    </div>
+    <div class="panel"><h3>Resultado del negocio</h3><div id="status" style="font-size:25px;font-weight:800">Sin movimientos todavía</div><p class="note">El resultado se calcula como ingresos menos egresos y costos registrados.</p></div>
+  </section>
+
+  <section id="inversion" class="page hidden"><div class="panel"><h3>Capital de inversión</h3><p class="note">La estructura sigue los cuadros de referencia: Equipo en General, Muebles y Enseres y Herramientas. Los datos de las fotos NO se cargaron.</p><form onsubmit="add('investment',this);return false"><div class="formgrid"><input name="detail" placeholder="Detalle" required><input name="amount" type="number" step=".01" placeholder="Gasto Bs" required></div><button>Agregar</button></form><div id="investmentTable"></div></div></section>
+
+  <section id="operacion" class="page hidden"><div class="panel"><h3>Capital de operación</h3><form onsubmit="add('operation',this);return false"><div class="formgrid"><input name="detail" placeholder="Detalle / recurso" required><input name="amount" type="number" step=".01" placeholder="Monto Bs" required></div><button>Agregar</button></form><div id="operationTable"></div></div></section>
+
+  <section id="materia" class="page hidden"><div class="panel"><h3>Cuadro de compra de materia prima</h3><p class="note">Diseñado para registrar una receta o lote, por ejemplo 100 unidades de cuñapé.</p><form onsubmit="add('material',this);return false"><div class="formgrid"><input name="qty" type="number" step=".001" placeholder="Cantidad" required><input name="unit" placeholder="Unidad (kg, litro, docena...)" required><input name="detail" placeholder="Descripción" required><input name="unitCost" type="number" step=".01" placeholder="Costo unitario Bs" required></div><button>Agregar materia prima</button></form><div id="materialTable"></div></div></section>
+
+  <section id="mano" class="page hidden"><div class="panel"><h3>Costo de mano de obra</h3><form onsubmit="add('labor',this);return false"><div class="formgrid"><input name="detail" placeholder="Descripción / puesto" required><input name="hourly" type="number" step=".01" placeholder="Sueldo por hora Bs" required><input name="hours" type="number" step=".01" placeholder="Horas trabajadas" required></div><button>Agregar</button></form><div id="laborTable"></div></div></section>
+
+  <section id="otros" class="page hidden"><div class="panel"><h3>Otros gastos de producción</h3><form onsubmit="add('other',this);return false"><div class="formgrid"><input name="qty" type="number" step=".001" placeholder="Cantidad" required><input name="unit" placeholder="Unidad" required><input name="detail" placeholder="Descripción" required><input name="unitCost" type="number" step=".01" placeholder="Costo unitario Bs" required></div><button>Agregar</button></form><div id="otherTable"></div></div></section>
+
+  <section id="fijos" class="page hidden"><div class="panel"><h3>Cálculo de costos fijos y depreciación</h3><p class="note">Permite registrar costo actualizado y porcentaje de depreciación anual; calcula automáticamente depreciación anual, mensual y diaria.</p><form onsubmit="add('fixed',this);return false"><div class="formgrid"><input name="detail" placeholder="Descripción" required><input name="updated" type="number" step=".01" placeholder="Costo actualizado Bs" required><input name="rate" type="number" step=".01" placeholder="% depreciación anual" required></div><button>Agregar</button></form><div id="fixedTable"></div></div></section>
+
+  <section id="ventas" class="page hidden"><div class="panel"><h3>Ventas / ingresos</h3><form onsubmit="add('sale',this);return false"><div class="formgrid"><input name="date" type="date" required><input name="units" type="number" step="1" placeholder="Cantidad de cuñapés" required><input name="price" type="number" step=".01" placeholder="Precio unitario Bs" required><select name="payment"><option>Efectivo</option><option>QR</option><option>Transferencia</option><option>Otro</option></select></div><button>Registrar venta</button></form><div id="saleTable"></div></div></section>
+
+  <section id="egresos" class="page hidden"><div class="panel"><h3>Cuentas de egresos</h3><form onsubmit="add('expense',this);return false"><div class="formgrid"><input name="date" type="date" required><input name="detail" placeholder="Concepto" required><input name="category" placeholder="Categoría" required><input name="amount" type="number" step=".01" placeholder="Monto Bs" required></div><button>Registrar egreso</button></form><div id="expenseTable"></div></div></section>
+
+  <section id="costos" class="page hidden"><div class="panel"><h3>Costos de producción</h3><div class="grid"><div class="stat">Materia prima<b id="cMat">Bs 0.00</b></div><div class="stat">Mano de obra<b id="cLab">Bs 0.00</b></div><div class="stat">Otros producción<b id="cOther">Bs 0.00</b></div><div class="stat">Depreciación diaria<b id="cFix">Bs 0.00</b></div></div><div class="panel"><h3>Resumen del lote</h3><div id="costSummary"></div></div></div></section>
+
+  <section id="reportes" class="page hidden"><div class="panel"><h3>Reportes</h3><div class="actions"><button onclick="window.print()">🖨️ Imprimir / Guardar PDF</button><button class="secondary" onclick="exportCSV()">⬇️ Exportar resumen CSV</button><button class="danger" onclick="resetData()">Borrar todos los datos</button></div><div id="report"></div></div></section>
+</main>
+<div class="cunape-bg">🥯</div>
+</div>
+<script>
+const keys=['investment','operation','material','labor','other','fixed','sale','expense'];
+let db=JSON.parse(localStorage.getItem('cunapeDB')||'{}'); keys.forEach(k=>db[k]??=[]);
+function save(){localStorage.setItem('cunapeDB',JSON.stringify(db));render()}
+function login(){if(document.getElementById('user').value==='admin'&&document.getElementById('pass').value==='admin123'){document.getElementById('login').style.display='none';document.getElementById('app').style.display='block';render()}else alert('Usuario o contraseña incorrectos.')}
+function logout(){location.reload()}
+function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.getElementById('title').textContent=document.querySelector('#'+id+' h3')?.textContent||'Panel principal';document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));event?.target?.classList.add('active');render()}
+function val(f,n){return Number(f.elements[n]?.value||0)}
+function add(type,f){
+ let o={id:Date.now(),date:f.elements.date?.value||new Date().toISOString().slice(0,10),detail:f.elements.detail?.value||'',amount:val(f,'amount')};
+ if(type==='material'||type==='other'){o.qty=val(f,'qty');o.unit=f.elements.unit.value;o.unitCost=val(f,'unitCost');o.total=o.qty*o.unitCost}
+ if(type==='labor'){o.hourly=val(f,'hourly');o.hours=val(f,'hours');o.total=o.hourly*o.hours}
+ if(type==='fixed'){o.updated=val(f,'updated');o.rate=val(f,'rate');o.annual=o.updated*o.rate/100;o.month=o.annual/12;o.day=o.annual/365}
+ if(type==='sale'){o.units=val(f,'units');o.price=val(f,'price');o.total=o.units*o.price;o.payment=f.elements.payment.value}
+ db[type].push(o);f.reset();save()
+}
+function money(n){return 'Bs '+Number(n||0).toFixed(2)}
+function sum(type,field='amount'){return db[type].reduce((a,x)=>a+Number(x[field]||0),0)}
+function table(type,headers,rows,tot){
+ const arr=db[type];let h='<div class="tablewrap"><table><thead><tr>'+headers.map(x=>'<th>'+x+'</th>').join('')+'<th>Acción</th></tr></thead><tbody>';
+ arr.forEach((x,i)=>h+='<tr>'+rows(x).map(y=>'<td>'+y+'</td>').join('')+'<td><button class="danger" onclick="del(\''+type+'\','+i+')">Eliminar</button></td></tr>');
+ h+='</tbody></table></div>'; if(tot!==undefined)h+='<p class="right"><b>Total: '+money(tot)+'</b></p>'; return h
+}
+function del(t,i){db[t].splice(i,1);save()}
+function render(){
+ document.getElementById('today').textContent=new Date().toLocaleDateString('es-BO');
+ document.getElementById('investmentTable').innerHTML=table('investment',['N°','DETALLES','GASTOS'],(x,i)=>[i+1,x.detail,money(x.amount)],sum('investment'));
+ document.getElementById('operationTable').innerHTML=table('operation',['N°','DETALLES','GASTOS'],(x,i)=>[i+1,x.detail,money(x.amount)],sum('operation'));
+ document.getElementById('materialTable').innerHTML=table('material',['CANTIDAD','UNIDAD','DESCRIPCIÓN','COSTO UNITARIO','COSTO TOTAL'],x=>[x.qty,x.unit,x.detail,money(x.unitCost),money(x.total)],sum('material','total'));
+ document.getElementById('laborTable').innerHTML=table('labor',['N°','DESCRIPCIÓN','SUELDO/HORA','HORAS','COSTO TOTAL'],(x,i)=>[i+1,x.detail,money(x.hourly),x.hours,money(x.total)],sum('labor','total'));
+ document.getElementById('otherTable').innerHTML=table('other',['CANTIDAD','UNIDAD','DESCRIPCIÓN','COSTO UNITARIO','COSTO TOTAL'],x=>[x.qty,x.unit,x.detail,money(x.unitCost),money(x.total)],sum('other','total'));
+ document.getElementById('fixedTable').innerHTML=table('fixed',['N°','DESCRIPCIÓN','COSTO ACTUALIZADO','% DEP.','DEP. ANUAL','DEP. MES','DEP. DÍA'],(x,i)=>[i+1,x.detail,money(x.updated),x.rate+'%',money(x.annual),money(x.month),money(x.day)],sum('fixed','day'));
+ document.getElementById('saleTable').innerHTML=table('sale',['FECHA','UNIDADES','PRECIO UNITARIO','TOTAL','PAGO'],x=>[x.date,x.units,money(x.price),money(x.total),x.payment],sum('sale','total'));
+ document.getElementById('expenseTable').innerHTML=table('expense',['FECHA','CONCEPTO','CATEGORÍA','MONTO'],x=>[x.date,x.detail,x.category,money(x.amount)],sum('expense'));
+ const mat=sum('material','total'),lab=sum('labor','total'),oth=sum('other','total'),fix=sum('fixed','day'),cost=mat+lab+oth+fix,inc=sum('sale','total'),exp=sum('expense'),inv=sum('investment'),units=sum('sale','units'),profit=inc-exp-cost;
+ document.getElementById('sIncome').textContent=money(inc);document.getElementById('sExpense').textContent=money(exp);document.getElementById('sCost').textContent=money(cost);document.getElementById('sProfit').textContent=money(profit);document.getElementById('sUnits').textContent=units;document.getElementById('sInv').textContent=money(inv);
+ document.getElementById('status').innerHTML=profit>0?'<span class="positive">RESULTADO POSITIVO: '+money(profit)+'</span>':profit<0?'<span class="negative">RESULTADO NEGATIVO: '+money(profit)+'</span>':'<span>EN EQUILIBRIO: Bs 0.00</span>';
+ document.getElementById('cMat').textContent=money(mat);document.getElementById('cLab').textContent=money(lab);document.getElementById('cOther').textContent=money(oth);document.getElementById('cFix').textContent=money(fix);
+ let unitCost=units?cost/units:0;document.getElementById('costSummary').innerHTML='<table><tr><th>Concepto</th><th>Valor</th></tr><tr><td>Costo total registrado</td><td>'+money(cost)+'</td></tr><tr><td>Unidades vendidas</td><td>'+units+'</td></tr><tr><td>Costo promedio por unidad</td><td>'+money(unitCost)+'</td></tr><tr><td>Ingresos</td><td>'+money(inc)+'</td></tr><tr><td>Egresos</td><td>'+money(exp)+'</td></tr><tr><td>Resultado</td><td class="'+(profit>=0?'positive':'negative')+'">'+money(profit)+'</td></tr></table>';
+ document.getElementById('report').innerHTML='<h3>Resumen general</h3><table><tr><th>Indicador</th><th>Valor</th></tr><tr><td>Capital de inversión</td><td>'+money(inv)+'</td></tr><tr><td>Capital de operación</td><td>'+money(sum('operation'))+'</td></tr><tr><td>Materia prima</td><td>'+money(mat)+'</td></tr><tr><td>Mano de obra</td><td>'+money(lab)+'</td></tr><tr><td>Otros gastos producción</td><td>'+money(oth)+'</td></tr><tr><td>Depreciación diaria</td><td>'+money(fix)+'</td></tr><tr><td>Ventas</td><td>'+money(inc)+'</td></tr><tr><td>Egresos</td><td>'+money(exp)+'</td></tr><tr><td>Resultado</td><td class="'+(profit>=0?'positive':'negative')+'">'+money(profit)+'</td></tr></table>';
+}
+function resetData(){if(confirm('¿Borrar todos los registros?')){keys.forEach(k=>db[k]=[]);save()}}
+function exportCSV(){let inc=sum('sale','total'),exp=sum('expense'),cost=sum('material','total')+sum('labor','total')+sum('other','total')+sum('fixed','day');let csv='Indicador,Valor\\nIngresos,'+inc+'\\nEgresos,'+exp+'\\nCostos de produccion,'+cost+'\\nResultado,'+(inc-exp-cost)+'\\nInversion,'+sum('investment')+'\\n';let a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='reporte_cunape.csv';a.click()}
+render();
+</script>
+</body>
+</html>
